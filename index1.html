@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Screen Recorder</title>
+	
+	<link rel="stylesheet" href="main.css" />
+</head>
+<body class="bg-gray-800 text-white">
+	
+	<header class="bg-gray-900">
+		<div class="container mx-auto">
+			<div class="flex justify-center items-center py-4">
+				<h1 class="text-2xl font-bold uppercase">Screen Recorder</h1>
+			</div>
+		</div>
+	</header>
+
+		<div class="main">
+
+			<div class="flex flex-wrap -mx-4 mb-8">
+				<button class="start-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50">
+					Record Screen
+				</button>
+				<button class="stop-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50" disabled>
+					Stop Recording
+				</button>
+				<video src="" class="recorded-video bg-black w-full h-auto mb-8" hidden></video>
+					<a class="download-video btn text-center mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50" disabled>
+						Save Recording
+					</a>
+
+			</div>
+		</div>
+
+	<script src="main.js"></script>
+</body>
+</html>

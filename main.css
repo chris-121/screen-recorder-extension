@@ -1,0 +1,10 @@
+body{
+    width: 320px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content:space-between
+}
+header{
+    text-align: center;
+}
