@@ -1,6 +1,6 @@
 body{
-    width: 320px;
-    height: 300px;
+    width: 400px;
+    height: 400px;
     display: flex;
     flex-direction: column;
     justify-content:space-between
@@ -8,3 +8,8 @@ body{
 header{
     text-align: center;
 }
+.disabled {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.6;
+  }

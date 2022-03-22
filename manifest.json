@@ -35,5 +35,8 @@
         "64": "capture.png",
         "128": "capture.png"
 
-    }
+    },
+    "web_accessible_resources": [
+        "audiosource.html"
+        ]
 }

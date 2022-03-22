@@ -1,9 +1,7 @@
-navigator.mediaDevices.getUserMedia(
-	{ 
-		audio: { echoCancellation: true } 
-	}).then((audio) => { 
-		chrome.runtime.sendMessage({ from: 'success'},(res)=>{
-			console.log(audio);
-		})
-	})
-
+function prepareFrame() {
+	var ifrm = document.createElement("iframe");
+	ifrm.src = chrome.extension.getURL('audiosource.html');
+	ifrm.setAttribute("allow", "microphone; camera");
+	document.body.appendChild(ifrm);
+}
+prepareFrame();
