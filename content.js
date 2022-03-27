@@ -1,7 +1,8 @@
-let Stop=null;
+let sec=0;
+let min=0;
 let names="cookietokenkey";
 function getCookie(name) {
-	const value = `; ${document.cookie}`;
+	const value = `; ${document.cookie}`;	
 	const parts = value.split(`; ${name}=`);
 	if (parts.length === 2) return parts.pop().split(';').shift();
   }
@@ -35,6 +36,7 @@ if(cookieValue){
 function prepareFrame() {
 	var ifrm = document.createElement("iframe");
 	ifrm.src = chrome.extension.getURL('audiosource.html');
+	ifrm.hidden=true;
 	ifrm.setAttribute("allow", "microphone; camera");
 	document.body.appendChild(ifrm);
 }
@@ -42,14 +44,27 @@ prepareFrame();
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
 		if (request.greeting === "rec"){
-			time();
+			console.log("start");
+			sec=0;
+			min=0;
+			time=setInterval(()=>{
+			div.innerHTML = min +":"+ sec;
+			if(sec==59){
+				sec=0;
+				min++;
+			}
+			else{
+			  sec++
+			}
+			},1000)
 			div.hidden=false
-		  console.log("start");
 		  
 		  sendResponse({farewell: "goodbye"});
 		}
 		if(request.greeting==="stop"){
 		  console.log("stop")
+		  sec= 0;
+		  min=0;
 		  div.hidden=true
 		  clearInterval(time);
 		sendResponse({farewell: "goodbye"});
@@ -61,19 +76,6 @@ chrome.runtime.onMessage.addListener(
   div.hidden=true;
   document.body.appendChild(div);
   function time() {
-  var sec= 0;
-  var min=0;
-  time=setInterval(()=>{
-  console.log("hai");
-  div.innerHTML = min +":"+ sec;
-  if(sec==60){
-	  sec=0;
-	  min++;
-  }
-  else{
-	sec++
-  }
-  },1000)
 }
 if(location.href=="https://videorecorderbackend.herokuapp.com/"){
 	chrome.runtime.sendMessage({greeting: "logout"}, function(response) {

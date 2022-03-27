@@ -95,10 +95,15 @@ window.addEventListener('load', () => {
 				},3000)
 			}
 			if(request.greeting=="rec"){
-				document.getElementById("recording").hidden=false
+				document.getElementById("recording").hidden=false;
+				document.getElementById('aws-text').hidden=true;
+				document.getElementById("save-rec").hidden=true;
+				document.getElementById("stop-rec").hidden=true;
 			}
 			if(request.greeting=="rec-stop"){
 				document.getElementById("recording").hidden=true;
+				document.getElementById('aws-text').hidden=true;
+				document.getElementById("save-rec").hidden=true;
 				document.getElementById("stop-rec").hidden=false;
 			}
 			if(request.greeting=="logout"){
