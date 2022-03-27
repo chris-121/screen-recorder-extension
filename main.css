@@ -1,6 +1,6 @@
 body{
-    width: 400px;
-    height: 400px;
+    width: 300px;
+    height: 200px;
     display: flex;
     flex-direction: column;
     justify-content:space-between
@@ -12,4 +12,19 @@ header{
     pointer-events: none;
     cursor: default;
     opacity: 0.6;
-  }
+}
+.alerts{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    color: red;
+    padding-bottom: 0px;
+}
+#func-div{
+    display: flex;
+    justify-content: space-evenly;
+}
+.logout{
+    width: 80px;
+    height: 30px;
+}

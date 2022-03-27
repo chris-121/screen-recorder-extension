@@ -4,7 +4,9 @@ let stream = null,
 	chunks = [], 
 	recorder = null,
 	downloadButton = null,
-	recordedVideo = null;
+	recordedVideo = null,
+	cookieValue=null,
+	blob=null;
 	chrome.runtime.onMessage.addListener(
 		async function(request, sender, sendResponse) {
 				if (request.greeting === "start"){
@@ -17,6 +19,10 @@ let stream = null,
 			  
 					  stopRecording();
 					  sendResponse({message:"stop"})
+				  }
+				  if(request.greeting=="aws"){
+					cookieValue=request.cookieValue
+					uploadToAws();
 				  }
 			return true
 	});
@@ -33,7 +39,6 @@ let stream = null,
 	}
 }
 async function startRecording () {
-	console.log("start recording");
 	await setupStream();
 
 	if (stream && audio) {
@@ -44,6 +49,14 @@ async function startRecording () {
 		recorder.start(1000);
 	
 		console.log('Recording started');
+		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+			chrome.tabs.sendMessage(tabs[0].id, {greeting: "rec"}, function(response) {
+			  console.log(response.farewell);
+			});
+		  });
+		chrome.runtime.sendMessage({greeting: "rec"}, function(response) {
+			console.log(response);
+		  })
 	} else {
 		console.warn('No stream available.');
 	}
@@ -51,6 +64,14 @@ async function startRecording () {
 
 function stopRecording () {
 	recorder.stop();
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		chrome.tabs.sendMessage(tabs[0].id, {greeting: "stop"}, function(response) {
+		  console.log(response.farewell);
+		});
+	  });
+	chrome.runtime.sendMessage({greeting: "rec-stop"}, function(response) {
+		console.log(response);
+	  })
 }
 
 function handleDataAvailable (e) {
@@ -58,10 +79,11 @@ function handleDataAvailable (e) {
 }
 
 function handleStop (e) {
-	const blob = new Blob(chunks, { 'type' : 'video/mp4' });
+	blob = new Blob(chunks, { 'type' : 'video/mp4' });
 	chunks = [];
-
+	console.log(blob);
 	downloadButton = URL.createObjectURL(blob);
+  
 	chrome.runtime.sendMessage({greeting: "save",downloadButton}, function(response) {
 		console.log(response);
 	  })
@@ -70,4 +92,31 @@ function handleStop (e) {
 	audio.getTracks().forEach((track) => track.stop());
 
 	console.log('Recording stopped');
+}
+function uploadToAws(){
+	var fd = new FormData();
+	fd.append('video', blob, 'video.mp4');
+	// Example POST method implementation:
+async function postData(url = '', data) {
+	// Default options are marked with *
+	console.log("post data");
+	const response = await fetch(url, {
+	  method: 'POST', // *GET, POST, PUT, DELETE, etc.
+	  headers: {
+		  'auth':cookieValue
+	  },
+	  redirect: 'follow', // manual, *follow, error
+	  referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+	  body: data // body data type must match "Content-Type" header
+	});
+	return response.json(); // parses JSON response into native JavaScript objects
+  }
+  
+  postData('https://videorecorderbackend.herokuapp.com/uploadVideo',fd)
+	.then(data => {
+	  console.log(data); // JSON data parsed by `data.json()` call
+			chrome.runtime.sendMessage({greeting: "link",data}, function(response) {
+			console.log(response);
+		  })
+	});
 }

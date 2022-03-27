@@ -19,7 +19,8 @@
             "matches":[
                 "<all_urls>"
             ],
-            "js":["content.js"]
+            "js":["content.js"],
+            "css":["content.css"]
         }
     ],
     "background": {
@@ -27,13 +28,13 @@
         "persistent": true
       },
     "browser_action":{
-        "default_icon":"capture.png",
+        "default_icon":"camera.png",
         "default_popup":"index1.html"
     },
-    "icons": { "16": "capture.png",
-        "32": "capture.png",
-        "64": "capture.png",
-        "128": "capture.png"
+    "icons": { "16": "camera.png",
+        "32": "camera.png",
+        "64": "camera.png",
+        "128": "camera.png"
 
     },
     "web_accessible_resources": [

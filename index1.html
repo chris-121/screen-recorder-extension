@@ -5,6 +5,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Screen Recorder</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 	<link rel="stylesheet" href="main.css" />
 </head>
@@ -13,28 +14,46 @@
 		<div>
 			<div class="mt-4">
 				<h1>Screen Recorder</h1>
+			</div> 
+				<p id="user" hidden></p>
+				<div class="alert alert-success" id="login-success" role="alert" hidden>
+					Succesfully logged in
+				  </div>
+				<button hidden class="logout btn btn-danger btn-sm">Logout</button>
+			<div class="alerts">
+				<p id="recording" hidden>Recording has started</p>
+				<p id="stop-rec" hidden>Recording has stopped</p>
+				<p id="aws-text" hidden>Uploaded to AWS</p>
+				<p id="save-rec" hidden>Recording saved</p>
+
 			</div>
 		</div>
 	</header>
 
 		<div class="main">
-
-			<div class="m-4">
-				<button class="start-recording btn btn-secondary btn-sm">
-					Record Screen
+			<div class="text-center" id="link-div" hidden>
+				<p>Shareable link</p>
+				<a href="" id="link"></a>
+			</div>
+			<div class="m-4" id="func-div" hidden>
+				<button class="start-recording btn btn-light btn-sm">
+					<i class="fa-solid fa-camera"></i>
+				</button>				
+				<button class="stop-recording btn btn-light btn-sm">
+					<i class="fa-regular fa-circle-stop"></i>
 				</button>
-				<button class="stop-recording btn btn-secondary btn-sm">
-					Stop Recording
+				<button class="aws btn btn-light btn-sm" disabled>
+					<i class="fa-solid fa-cloud-arrow-up"></i>
 				</button>
 				<video src="" class="recorded-video" hidden></video>
-					<a class="download-video btn btn-secondary btn-sm disabled" >
-						Save Recording
+					<a class="download-video btn btn-light btn-sm disabled" >
+						<i class="fa-solid fa-download"></i>
 					</a>
-					<div class="m-2 text-center">
-						<a href="#" class="btn btn-primary btn-sm">Sign in/Sign up</a>
-					</div>
-
-			</div>
+					
+				</div>
+				<div class="m-2 text-center">
+					<button class="route btn btn-secondary btn-sm">Sign in/Sign up</button>
+				</div>
 		</div>
 	<script src="main.js">
 	</script>
