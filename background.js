@@ -6,26 +6,51 @@ let stream = null,
 	downloadButton = null,
 	recordedVideo = null,
 	cookieValue=null,
+	recordingStatus=null,
+	user=null,
 	blob=null;
+	tabid=null;
+	var seconds = 00; 
+	var mins = 00; 
+	var hours=00;
+	var tabid;
+	var Interval
 	chrome.runtime.onMessage.addListener(
 		async function(request, sender, sendResponse) {
 				if (request.greeting === "start"){
+					tabid=request.tabid;
 					console.log("start");
-							startRecording();
+					startRecording();
+					
 							  sendResponse({message:"start"})
 				  }
 				  if (request.greeting === "stop"){
 					  console.log("stop");
+					  recordingStatus=false;
 			  
 					  stopRecording();
 					  sendResponse({message:"stop"})
 				  }
-				  if(request.greeting=="aws"){
+				  if(request.greeting=="cookieValue"){
 					cookieValue=request.cookieValue
+					user=request.data
+				  }
+				  if(request.greeting=="logout"){
+					  console.log("logout");
+					cookieValue=null;
+					user=null;
+				}
+				  if(request.greeting=="aws"){
 					uploadToAws();
 				  }
 			return true
 	});
+	function checkUser(){
+		console.log("check user");
+		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid}, function(response) {
+			console.log(response);
+		  })
+	}
 	async function setupStream () {
 		try {
 			stream = await navigator.mediaDevices.getDisplayMedia({
@@ -47,16 +72,19 @@ async function startRecording () {
 		recorder.ondataavailable = handleDataAvailable;
 		recorder.onstop = handleStop;
 		recorder.start(1000);
-	
 		console.log('Recording started');
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+			tabid=tabs[0].id;
 			chrome.tabs.sendMessage(tabs[0].id, {greeting: "rec"}, function(response) {
 			  console.log(response.farewell);
 			});
 		  });
+		  recordingStatus=true;
 		chrome.runtime.sendMessage({greeting: "rec"}, function(response) {
 			console.log(response);
 		  })
+		  clearInterval(Interval);
+		  Interval = setInterval(startTimer, 1000);
 	} else {
 		console.warn('No stream available.');
 	}
@@ -65,13 +93,16 @@ async function startRecording () {
 function stopRecording () {
 	recorder.stop();
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		chrome.tabs.sendMessage(tabs[0].id, {greeting: "stop"}, function(response) {
+
+		chrome.tabs.sendMessage(tabid, {greeting: "stop"}, function(response) {
 		  console.log(response.farewell);
 		});
 	  });
 	chrome.runtime.sendMessage({greeting: "rec-stop"}, function(response) {
 		console.log(response);
 	  })
+	  clearInterval(Interval);
+	  seconds=0,mins=0;hours=0;
 }
 
 function handleDataAvailable (e) {
@@ -79,6 +110,7 @@ function handleDataAvailable (e) {
 }
 
 function handleStop (e) {
+	console.log(hours,":",mins,":",seconds);
 	blob = new Blob(chunks, { 'type' : 'video/mp4' });
 	chunks = [];
 	console.log(blob);
@@ -120,3 +152,17 @@ async function postData(url = '', data) {
 		  })
 	});
 }
+function startTimer () {
+    seconds++;  
+    if (seconds > 59) {
+      console.log("seconds");
+      seconds = 0;
+	  mins++
+    }
+	if(mins>59){
+		mins=0;
+		hours++;
+	}
+  
+  }
+  
