@@ -34,11 +34,11 @@ if(cookieValue){
 }
 chrome.runtime.onMessage.addListener(
 	async function(request, sender, sendResponse) {
-			if (request.greeting === "startsss"){
+			if (request.greeting === "start-content"){
 				tabid=request.tabid;
 				prepareFrame();
 				setTimeout(()=>{
-					chrome.runtime.sendMessage({greeting: "starts",tabid}, function(response) {
+					chrome.runtime.sendMessage({greeting: "audiosource",tabid}, function(response) {
 						console.log(response);
 					  })
 

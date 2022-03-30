@@ -37,7 +37,7 @@ window.addEventListener('load', () => {
 
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 			tabid=tabs[0].id;
-			chrome.tabs.sendMessage(tabs[0].id, {greeting: "startsss",tabid}, function(response) {
+			chrome.tabs.sendMessage(tabs[0].id, {greeting: "start-content",tabid}, function(response) {
 			  console.log(response.farewell);
 			});
 		  });
@@ -142,12 +142,13 @@ window.addEventListener('load', () => {
 					if(request.recordingStatus){
 						startButton.disabled=true;
 						stopButton.disabled=false;	
-						document.getElementById("timer").hidden=false;
 						seconds=request.seconds;
 						mins=request.mins;
 						hours=request.hours;
+						startTimer();
 						clearInterval(Interval);
 						Interval=setInterval(startTimer,1000);
+						document.getElementById("timer").hidden=false;
 					}else
 					stopButton.disabled=true;
 					if(request.blob)
