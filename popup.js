@@ -80,8 +80,8 @@ window.addEventListener('load', () => {
 			sendResponse({farewell: "goodbye"});
 		  }
 			if(request.greeting==="link"){
-				link.innerText=request.data
-				link.href=request.data
+				link.innerText=request.awsLink
+				link.href=request.awsLink
 				linkDiv.hidden=false;
 				console.log("link working");
 				document.getElementById("timer").hidden=true;
@@ -89,6 +89,14 @@ window.addEventListener('load', () => {
 				document.getElementById("save-rec").hidden=true;
 				document.getElementById('aws-text').innerHTML="Uploaded to AWS";
 				document.getElementById('aws-text').hidden=false
+				document.getElementById('progress-bar').hidden=false;
+			}
+			if(request.greeting==="uploadPercentage"){
+				console.log(request.percent_completed);
+				var percentage=Math.round(request.percent_completed)
+				document.getElementById('progress-bar').hidden=false;
+				document.getElementById('progress').style.width=percentage+"%"
+				document.getElementById('progress').innerHTML=percentage+"% completed"
 			}
 	//		if(request.greeting=="cookieValue"){
 	//			console.log(request);
@@ -155,6 +163,7 @@ window.addEventListener('load', () => {
 					if(request.isUploading){
 						document.getElementById('aws-text').hidden=false
 						document.getElementById('aws-text').innerHTML="Uploading";
+						document.getElementById('progress-bar').hidden=false;
 					}
 					if(request.awsLink){
 						link.innerText=request.awsLink
@@ -163,8 +172,12 @@ window.addEventListener('load', () => {
 						document.getElementById('aws-text').hidden=false
 						document.getElementById('aws-text').innerHTML="Uploaded to AWS";
 					}
-					if(request.blob)
-					awsBtn.disabled=false;
+					if(request.blob){
+						awsBtn.disabled=false;
+						if(request.isUploaded){
+							awsBtn.disabled=true;
+						}
+					}
 					if(request.downloadButton){
 						downloadButton.href=request.downloadButton;
 						downloadButton.download = 'video.mp4';

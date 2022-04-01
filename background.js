@@ -8,10 +8,12 @@ let stream = null,
 	cookieValue=null,
 	recordingStatus=null,
 	isUploading=null,
+	isUploaded=null,
 	awsLink=null;
 	user=null,
-	blob=null;
-	tabid=null;
+	blob=null,
+	tabid=null,
+	percent_completed=null;
 	var seconds = 00; 
 	var mins = 00; 
 	var hours=00;
@@ -51,7 +53,7 @@ let stream = null,
 	});
 	function checkUser(){
 		console.log("check user");
-		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid,isUploading,awsLink}, function(response) {
+		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid,isUploading,isUploaded,awsLink}, function(response) {
 			console.log(response);
 		  })
 	}
@@ -64,6 +66,11 @@ let stream = null,
 				audio:true
 			})
         } catch (err) {	
+			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+				chrome.tabs.sendMessage(tabid, {greeting: "stopss"}, function(response) {
+				  console.log(response.farewell);
+				});
+			  });
 		console.error(err)
 	}
 }
@@ -130,33 +137,38 @@ function handleStop (e) {
 	console.log('Recording stopped');
 }
 function uploadToAws(){
-	var fd = new FormData();
-	fd.append('video', blob, 'video.mp4');
-	// Example POST method implementation:
-async function postData(url = '', data) {
-	// Default options are marked with *
-	console.log("post data");
-	const response = await fetch(url, {
-	  method: 'POST', // *GET, POST, PUT, DELETE, etc.
-	  headers: {
-		  'auth':cookieValue
-	  },
-	  redirect: 'follow', // manual, *follow, error
-	  referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-	  body: data // body data type must match "Content-Type" header
-	});
-	return response.json(); // parses JSON response into native JavaScript objects
-  }
-  
-  postData('https://videorecorderbackend.herokuapp.com/uploadVideo',fd)
-	.then(data => {
-	  console.log(data); // JSON data parsed by `data.json()` call
-	  awsLink=data;	
-	  isUploading=false;
-	  chrome.runtime.sendMessage({greeting: "link",data}, function(response) {
-			console.log(response);
-		  })
-	});
+	let data = new FormData();
+data.append('video', blob, 'video.mp4');
+
+let request = new XMLHttpRequest();
+request.open('POST', 'https://videorecorderbackend.herokuapp.com/uploadVideo'); 
+request.setRequestHeader("auth", cookieValue);
+
+// upload progress event
+request.upload.addEventListener('progress', function(e) {
+	// upload progress as percentage
+	percent_completed= (e.loaded / e.total)*100;
+	chrome.runtime.sendMessage({greeting: "uploadPercentage",percent_completed}, function(response) {
+		console.log(response);
+	  })
+	console.log(percent_completed);
+
+});
+// request finished event
+request.addEventListener('load', function(e) {
+	// HTTP status message (200, 404 etc)
+	isUploading=false;
+	isUploaded=true;
+	console.log(request.status);
+	// request.response holds response from the server
+	console.log(request.response);
+	awsLink= request.response.substring(1,request.response.length-1)
+	chrome.runtime.sendMessage({greeting: "link",awsLink}, function(response) {
+		console.log(response);
+	  })
+});
+// send POST request to server
+request.send(data);
 }
 function startTimer () {
     seconds++;  

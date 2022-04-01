@@ -20,11 +20,10 @@
 					Succesfully logged in
 				  </div>
 				<button hidden class="home btn btn-sm">Home</button>
-				<div class="container" style="padding-top: 8px;">
+				<div hidden class="container" id="progress-bar" style="padding-top: 8px;">
 				<div class="progress">
-					<div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="50"
-					aria-valuemin="0" aria-valuemax="100" style="width:70%">
-					  70% Complete (info)
+					<div class="progress-bar progress-bar-info" id="progress" role="progressbar" aria-valuenow="50"
+					aria-valuemin="0" aria-valuemax="100" style="width:0%">
 					</div>
 				  </div>
 				</div>
@@ -43,6 +42,7 @@
 		<div class="main">
 			<div class="text-center" id="link-div" hidden>
 				<p>Shareable link</p>
+				<p>This link is private <a href="google.com">click here</a> to change</p>
 				<a href="" id="link"></a>
 			</div>
 			<div class="m-4" id="func-div" hidden>
