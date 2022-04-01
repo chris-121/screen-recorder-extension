@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
 	homeBtn=document.querySelector(".home");
 	awsBtn=document.querySelector(".aws");
 	funcDiv=document.getElementById("func-div");
+	link=document.getElementById("link")
 	load();
 //	let value=localStorage.getItem("user")
 //	if(value){
@@ -34,7 +35,8 @@ window.addEventListener('load', () => {
 //detele token from storage and change status
 	})
 	startButton.addEventListener('click',()=>{
-
+		linkDiv.hidden=true;
+		document.getElementById('aws-text').hidden=true;
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 			tabid=tabs[0].id;
 			chrome.tabs.sendMessage(tabs[0].id, {greeting: "start-content",tabid}, function(response) {
@@ -78,7 +80,6 @@ window.addEventListener('load', () => {
 			sendResponse({farewell: "goodbye"});
 		  }
 			if(request.greeting==="link"){
-				let link=document.getElementById("link")
 				link.innerText=request.data
 				link.href=request.data
 				linkDiv.hidden=false;
@@ -151,6 +152,17 @@ window.addEventListener('load', () => {
 						document.getElementById("timer").hidden=false;
 					}else
 					stopButton.disabled=true;
+					if(request.isUploading){
+						document.getElementById('aws-text').hidden=false
+						document.getElementById('aws-text').innerHTML="Uploading";
+					}
+					if(request.awsLink){
+						link.innerText=request.awsLink
+						link.href=request.awsLink
+						linkDiv.hidden=false;
+						document.getElementById('aws-text').hidden=false
+						document.getElementById('aws-text').innerHTML="Uploaded to AWS";
+					}
 					if(request.blob)
 					awsBtn.disabled=false;
 					if(request.downloadButton){

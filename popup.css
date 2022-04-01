@@ -1,0 +1,61 @@
+:root{
+    --color:#e9e9fd;
+    --highlight-color:#625df5;
+}
+body{
+    width: 300px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content:space-between
+}
+header{
+    text-align: center;
+}
+.disabled {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.6;
+}
+.alerts{
+    padding-top:5px ;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    color: var(--highlight-color);
+    padding-bottom: 0px;
+}
+#func-div{
+    display: flex;
+    justify-content: space-evenly;
+}
+.home{
+    border-radius: .4rem;
+    font-weight: 700;
+    background-color:var(--color);
+    border: 2px solid transparent;
+}
+.home:hover{
+    border: 2px solid var(--highlight-color);
+    background-color: var(--color);    
+}
+.btns{
+    background-color: var(--color);
+    border: 2px solid transparent;
+    border-radius: .4rem;
+}
+.icon-cog {
+    color:var(--highlight-color) ;
+}
+.sign-up{
+    border-radius: 0.4rem;
+    background-color:white;
+    border: 1px solid;
+    border-color: var(--color);
+    width: 16.45em;
+    height: 2.45em;
+}
+.sign-up:hover{
+    border-color: var(--color);
+    background-color: #dcdce0;
+}

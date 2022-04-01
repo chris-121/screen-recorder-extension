@@ -1,8 +1,0 @@
-.timer{
-    z-index:1000;
-    position: fixed;
-    top: 0;
-    right: 30px;
-    color: red;
-    background-color: none;
-}

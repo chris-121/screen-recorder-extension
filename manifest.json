@@ -19,8 +19,7 @@
             "matches":[
                 "<all_urls>"
             ],
-            "js":["content.js"],
-            "css":["content.css"]
+            "js":["content.js"]
         }
     ],
     "background": {
@@ -29,7 +28,7 @@
       },
     "browser_action":{
         "default_icon":"camera.png",
-        "default_popup":"index1.html"
+        "default_popup":"popup.html"
     },
     "icons": { "16": "camera.png",
         "32": "camera.png",

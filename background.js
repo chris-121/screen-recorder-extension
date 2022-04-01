@@ -7,6 +7,8 @@ let stream = null,
 	recordedVideo = null,
 	cookieValue=null,
 	recordingStatus=null,
+	isUploading=null,
+	awsLink=null;
 	user=null,
 	blob=null;
 	tabid=null;
@@ -19,6 +21,7 @@ let stream = null,
 		async function(request, sender, sendResponse) {
 				if (request.greeting === "start"){
 					tabid=request.tabid;
+					awsLink=null;
 					console.log("start");
 					startRecording();
 					
@@ -41,13 +44,14 @@ let stream = null,
 					user=null;
 				}
 				  if(request.greeting=="aws"){
+					  isUploading=true;
 					uploadToAws();
 				  }
 			return true
 	});
 	function checkUser(){
 		console.log("check user");
-		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid}, function(response) {
+		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid,isUploading,awsLink}, function(response) {
 			console.log(response);
 		  })
 	}
@@ -147,7 +151,9 @@ async function postData(url = '', data) {
   postData('https://videorecorderbackend.herokuapp.com/uploadVideo',fd)
 	.then(data => {
 	  console.log(data); // JSON data parsed by `data.json()` call
-			chrome.runtime.sendMessage({greeting: "link",data}, function(response) {
+	  awsLink=data;	
+	  isUploading=false;
+	  chrome.runtime.sendMessage({greeting: "link",data}, function(response) {
 			console.log(response);
 		  })
 	});
