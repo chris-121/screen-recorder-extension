@@ -127,7 +127,7 @@ function handleStop (e) {
 	console.log(blob);
 	downloadButton = URL.createObjectURL(blob);
   
-	chrome.runtime.sendMessage({greeting: "save",downloadButton}, function(response) {
+	chrome.runtime.sendMessage({greeting: "save",downloadButton,cookieValue}, function(response) {
 		console.log(response);
 	  })
 

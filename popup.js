@@ -72,11 +72,16 @@ window.addEventListener('load', () => {
 	chrome.runtime.onMessage.addListener(
 		function(request, sender, sendResponse) {
 		  if (request.greeting === "save"){
-			awsBtn.disabled=false;
-			downloadButton.href=request.downloadButton
-			downloadButton.download = 'video.mp4';
-			downloadButton.disabled = false;
-			downloadButton.classList.remove("disabled")
+			  console.log(request);
+			  downloadButton.href=request.downloadButton
+			  downloadButton.download = 'video.mp4';
+			  if(request.cookieValue){
+				awsBtn.disabled=false;
+				downloadButton.disabled = false;
+				downloadButton.classList.remove("disabled")
+			  }else{
+				document.getElementById("sign-in-alert").hidden=false;
+			  }
 			sendResponse({farewell: "goodbye"});
 		  }
 			if(request.greeting==="link"){
@@ -138,6 +143,17 @@ window.addEventListener('load', () => {
 			}
 			if(request.greeting=="checkUser"){
 				console.log(request);
+				if(request.recordingStatus){
+					startButton.disabled=true;
+					stopButton.disabled=false;	
+					seconds=request.seconds;
+					mins=request.mins;
+					hours=request.hours;
+					startTimer();
+					clearInterval(Interval);
+					Interval=setInterval(startTimer,1000);
+					document.getElementById("timer").hidden=false;
+				}
 				if(request.cookieValue){
 					console.log(request);
 					tabid=request.tabid;
@@ -148,18 +164,6 @@ window.addEventListener('load', () => {
 					homeBtn.hidden=false
 					signUpBtn.hidden=true
 					funcDiv.hidden=false;
-					if(request.recordingStatus){
-						startButton.disabled=true;
-						stopButton.disabled=false;	
-						seconds=request.seconds;
-						mins=request.mins;
-						hours=request.hours;
-						startTimer();
-						clearInterval(Interval);
-						Interval=setInterval(startTimer,1000);
-						document.getElementById("timer").hidden=false;
-					}else
-					stopButton.disabled=true;
 					if(request.isUploading){
 						document.getElementById('aws-text').hidden=false
 						document.getElementById('aws-text').innerHTML="Uploading";
@@ -183,6 +187,10 @@ window.addEventListener('load', () => {
 						downloadButton.download = 'video.mp4';
 						downloadButton.disabled = false;
 						downloadButton.classList.remove("disabled")
+					}
+				}else{
+					if(request.blob){
+						document.getElementById("sign-in-alert").hidden=false;
 					}
 				}
 			}

@@ -16,9 +16,9 @@
 				<h1>Screen Recorder</h1>
 			</div> 
 				<p id="user" hidden></p>
-				<div class="alert alert-success" id="login-success" role="alert" hidden>
-					Succesfully logged in
-				  </div>
+				<div class="m-2 text-center">
+					<button class="sign-up btn btn-sm">Sign in</button>
+				</div>
 				<button hidden class="home btn btn-sm">Home</button>
 				<div hidden class="container" id="progress-bar" style="padding-top: 8px;">
 				<div class="progress">
@@ -34,7 +34,10 @@
 				<p id="stop-rec" hidden>Recording has stopped</p>
 				<p id="aws-text" hidden></p>
 				<p id="save-rec" hidden>Recording saved</p>
-
+				
+			</div>
+			<div class="sign-in-alert">
+				<p id="sign-in-alert" hidden>Sign in to save your recordings</p>
 			</div>
 		</div>
 	</header>
@@ -42,27 +45,24 @@
 		<div class="main">
 			<div class="text-center" id="link-div" hidden>
 				<p>Shareable link</p>
-				<p>This link is private <a href="google.com">click here</a> to change</p>
+				<p>This link is private <a href="">click here</a> to change</p>
 				<a href="" id="link"></a>
 			</div>
-			<div class="m-4" id="func-div" hidden>
-				<button class="start-recording btns btn-light btn-sm">
+			<div class="m-4" id="func-div">
+				<button title="Start Recording" class="start-recording btns btn-light btn-sm">
 					<i class="fa-solid fa-camera icon-cog"></i>
 				</button>				
-				<button class="stop-recording btn btns btn-light btn-sm">
+				<button title="Stop Recording" class="stop-recording btn btns btn-light btn-sm" disabled>
 					<i class="fa-regular fa-circle-stop icon-cog"></i>
 				</button>
-				<button class="aws btn btns btn-light btn-sm" disabled>
+				<button title="Upload" class="aws btn btns btn-light btn-sm" disabled>
 					<i class="fa-solid fa-cloud-arrow-up icon-cog"></i>
 				</button>
 				<video src="" class="recorded-video" hidden></video>
-					<a class="download-video btns btn-light btn-sm disabled" >
+					<a title="Download" class="download-video btns btn-light btn-sm disabled" >
 						<i class="fa-solid fa-download icon-cog"></i>
 					</a>
 					
-				</div>
-				<div class="m-2 text-center">
-					<button class="sign-up btn btn-sm">Sign in/Sign up</button>
 				</div>
 		</div>
 	<script src="popup.js">

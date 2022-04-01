@@ -52,10 +52,14 @@ header{
     background-color:white;
     border: 1px solid;
     border-color: var(--color);
-    width: 16.45em;
+    width: 10.45em;
     height: 2.45em;
 }
 .sign-up:hover{
     border-color: var(--color);
     background-color: #dcdce0;
+}
+.sign-in-alert{
+    padding-top:5px ;
+    color: var(--highlight-color);
 }
