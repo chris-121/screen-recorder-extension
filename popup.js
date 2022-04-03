@@ -2,6 +2,7 @@ var bgpage = chrome.extension.getBackgroundPage();
 var Interval;
 var seconds=0,mins=0,hours=0;
 var tabid;
+var url=null;
 window.addEventListener('load', () => {
 	signUpBtn =document.querySelector(".sign-up");
 	homeBtn=document.querySelector(".home");
@@ -24,6 +25,13 @@ window.addEventListener('load', () => {
 	let linkDiv=document.getElementById("link-div")
 	function load(){
 		console.log("function called");
+		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+			chrome.tabs.sendMessage(tabs[0].id, {greeting: "check-tab"}, function(response) {
+			  if(response.url){
+				url=response.url;		  
+			  }
+			});
+		  });
 		bgpage.checkUser();
 	}
 	  
@@ -37,12 +45,16 @@ window.addEventListener('load', () => {
 	startButton.addEventListener('click',()=>{
 		linkDiv.hidden=true;
 		document.getElementById('aws-text').hidden=true;
-		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-			tabid=tabs[0].id;
-			chrome.tabs.sendMessage(tabs[0].id, {greeting: "start-content",tabid}, function(response) {
-			  console.log(response.farewell);
-			});
-		  });
+		if(url){
+			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+				tabid=tabs[0].id;
+				chrome.tabs.sendMessage(tabs[0].id, {greeting: "start-content",tabid}, function(response) {
+				  console.log(response.farewell);
+				});
+			  });
+		}else{
+			chrome.tabs.create({ url: "https://videorecorderbackend.herokuapp.com" });
+		}
 	}
 	)	
 	stopButton.addEventListener('click',()=>{
@@ -64,6 +76,9 @@ window.addEventListener('load', () => {
 		  })
 	})
 	downloadButton.addEventListener('click',()=>{
+		chrome.tabs.sendMessage(tabid, {greeting: "uploadAndDownload"}, function(response) {
+			console.log(response.farewell);
+		  });
 		document.getElementById("timer").hidden=true;
 		document.getElementById("stop-rec").hidden=true;
 		document.getElementById('aws-text').hidden=true;
@@ -144,6 +159,7 @@ window.addEventListener('load', () => {
 			if(request.greeting=="checkUser"){
 				console.log(request);
 				if(request.recordingStatus){
+					tabid=request.tabid;
 					startButton.disabled=true;
 					stopButton.disabled=false;	
 					seconds=request.seconds;
@@ -156,7 +172,6 @@ window.addEventListener('load', () => {
 				}
 				if(request.cookieValue){
 					console.log(request);
-					tabid=request.tabid;
 					var email = request.user.email;
 					var name = email.substring(0, email. lastIndexOf("@"));
 					document.getElementById('user').innerHTML="Hey "+name

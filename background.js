@@ -17,7 +17,7 @@ let stream = null,
 	var seconds = 00; 
 	var mins = 00; 
 	var hours=00;
-	var tabid;
+	var tabid=null;
 	var Interval
 	chrome.runtime.onMessage.addListener(
 		async function(request, sender, sendResponse) {
@@ -49,6 +49,9 @@ let stream = null,
 					  isUploading=true;
 					uploadToAws();
 				  }
+				  if(request.greeting=="uploadAndDownload"){
+				  uploadAndDwonload();
+				}
 			return true
 	});
 	function checkUser(){
@@ -115,7 +118,6 @@ function stopRecording () {
 	  clearInterval(Interval);
 	  seconds=0,mins=0;hours=0;
 }
-
 function handleDataAvailable (e) {
 	chunks.push(e.data);
 }
@@ -142,6 +144,40 @@ data.append('video', blob, 'video.mp4');
 
 let request = new XMLHttpRequest();
 request.open('POST', 'https://videorecorderbackend.herokuapp.com/uploadVideo'); 
+request.setRequestHeader("auth", cookieValue);
+
+// upload progress event
+request.upload.addEventListener('progress', function(e) {
+	// upload progress as percentage
+	percent_completed= (e.loaded / e.total)*100;
+	chrome.runtime.sendMessage({greeting: "uploadPercentage",percent_completed}, function(response) {
+		console.log(response);
+	  })
+	console.log(percent_completed);
+
+});
+// request finished event
+request.addEventListener('load', function(e) {
+	// HTTP status message (200, 404 etc)
+	isUploading=false;
+	isUploaded=true;
+	console.log(request.status);
+	// request.response holds response from the server
+	console.log(request.response);
+	awsLink= request.response.substring(1,request.response.length-1)
+	chrome.runtime.sendMessage({greeting: "link",awsLink}, function(response) {
+		console.log(response);
+	  })
+});
+// send POST request to server
+request.send(data);
+}
+function uploadToAws(){
+	let data = new FormData();
+data.append('video', blob, 'video.mp4');
+
+let request = new XMLHttpRequest();
+request.open('POST', 'https://videorecorderbackend.herokuapp.com/downloadVideo'); 
 request.setRequestHeader("auth", cookieValue);
 
 // upload progress event

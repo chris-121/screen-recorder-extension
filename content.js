@@ -35,14 +35,15 @@ if(cookieValue){
 chrome.runtime.onMessage.addListener(
 	async function(request, sender, sendResponse) {
 			if (request.greeting === "start-content"){
+				console.log("hai");
 				tabid=request.tabid;
-				prepareFrame();
-				setTimeout(()=>{
-					chrome.runtime.sendMessage({greeting: "audiosource",tabid}, function(response) {
-						console.log(response);
-					  })
-
-				},100)
+					prepareFrame();
+					setTimeout(()=>{
+						chrome.runtime.sendMessage({greeting: "audiosource",tabid}, function(response) {
+							console.log(response);
+						  })
+	
+					},100)
 			}
 			if (request.greeting === "stopss"){
 				chrome.runtime.sendMessage({greeting: "stop"}, function(response) {
@@ -50,14 +51,21 @@ chrome.runtime.onMessage.addListener(
 				  })
 				remove();
 			}
+			if(request.greeting==="check-tab"){
+				if(window.location.href){
+					console.log(window.location.href);
+					sendResponse({url:true})
+				}
+			}
 });
 function prepareFrame() {
+	iframe=true;
 	var ifrm = document.createElement("iframe");
 	ifrm.src = chrome.extension.getURL('audiosource.html');
 	ifrm.hidden=true;
 	ifrm.id="iframe"
 	ifrm.setAttribute("allow", "microphone; camera");
-	document.body.appendChild(ifrm);
+	document.body.appendChild(ifrm);	
 }
 function remove(){
 	var ifrm = document.getElementById("iframe");
