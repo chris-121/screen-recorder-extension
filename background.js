@@ -210,7 +210,7 @@ request.addEventListener('load', function(e) {
 // send POST request to server
 request.send(data);
 }
-function uploadToAws(){
+function uploadAndDownload(){
 	let data = new FormData();
 data.append('video', blob, 'video.mp4');
 
