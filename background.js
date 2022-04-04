@@ -22,10 +22,19 @@ let stream = null,
 	chrome.runtime.onMessage.addListener(
 		async function(request, sender, sendResponse) {
 				if (request.greeting === "start"){
-					tabid=request.tabid;
-					awsLink=null;
-					console.log("start");
-					startRecording();
+					console.log(request);
+					if(request.mute){
+						tabid=request.tabid;
+						awsLink=null;
+						console.log("start");
+						startRecordingMute();						
+					}else{
+						tabid=request.tabid;
+						awsLink=null;
+						console.log("start with audio");
+						startRecording();
+
+					}
 					
 							  sendResponse({message:"start"})
 				  }
@@ -60,14 +69,16 @@ let stream = null,
 			console.log(response);
 		  })
 	}
-	async function setupStream () {
+	async function setupStream (audios) {
 		try {
 			stream = await navigator.mediaDevices.getDisplayMedia({
-				video:true
+				video:true,
 			});
-			audio=await navigator.mediaDevices.getUserMedia({
-				audio:true
-			})
+			if(audios){
+				audio=await navigator.mediaDevices.getUserMedia({
+					audio:true
+				})
+			}
         } catch (err) {	
 			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 				chrome.tabs.sendMessage(tabid, {greeting: "stopss"}, function(response) {
@@ -78,9 +89,11 @@ let stream = null,
 	}
 }
 async function startRecording () {
-	await setupStream();
+	var audios=true;
+	await setupStream(audios);
 
 	if (stream && audio) {
+		console.log("recording");
 		mixedStream = new MediaStream([...stream.getTracks(), ...audio.getTracks()]);
 		recorder = new MediaRecorder(mixedStream);
 		recorder.ondataavailable = handleDataAvailable;
@@ -103,7 +116,32 @@ async function startRecording () {
 		console.warn('No stream available.');
 	}
 }
+async function startRecordingMute () {
+	await setupStream();
 
+	if (stream) {
+		mixedStream = new MediaStream([...stream.getTracks()]);
+		recorder = new MediaRecorder(mixedStream);
+		recorder.ondataavailable = handleDataAvailable;
+		recorder.onstop = handleStop;
+		recorder.start(1000);
+		console.log('Recording started');
+		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+			tabid=tabs[0].id;
+			chrome.tabs.sendMessage(tabs[0].id, {greeting: "rec"}, function(response) {
+			  console.log(response.farewell);
+			});
+		  });
+		  recordingStatus=true;
+		chrome.runtime.sendMessage({greeting: "rec"}, function(response) {
+			console.log(response);
+		  })
+		  clearInterval(Interval);
+		  Interval = setInterval(startTimer, 1000);
+	} else {
+		console.warn('No stream available.');
+	}
+}
 function stopRecording () {
 	recorder.stop();
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {

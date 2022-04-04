@@ -35,15 +35,22 @@ if(cookieValue){
 chrome.runtime.onMessage.addListener(
 	async function(request, sender, sendResponse) {
 			if (request.greeting === "start-content"){
-				console.log("hai");
-				tabid=request.tabid;
-					prepareFrame();
-					setTimeout(()=>{
-						chrome.runtime.sendMessage({greeting: "audiosource",tabid}, function(response) {
-							console.log(response);
-						  })
-	
-					},100)
+				if(request.mute==false){
+					console.log("hai");
+					tabid=request.tabid;
+						prepareFrame();
+						setTimeout(()=>{
+							chrome.runtime.sendMessage({greeting: "audiosource",tabid}, function(response) {
+								console.log(response);
+							  })
+		
+						},100)
+				}else{
+					var mute=true
+					chrome.runtime.sendMessage({greeting: "start",tabid,mute}, function(response) {
+						console.log(response);
+					  })
+				}
 			}
 			if (request.greeting === "stopss"){
 				chrome.runtime.sendMessage({greeting: "stop"}, function(response) {

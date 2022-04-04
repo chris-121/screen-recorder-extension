@@ -45,10 +45,12 @@ window.addEventListener('load', () => {
 	startButton.addEventListener('click',()=>{
 		linkDiv.hidden=true;
 		document.getElementById('aws-text').hidden=true;
+		var mute=document.getElementById('mute').checked
+		console.log(mute);
 		if(url){
 			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 				tabid=tabs[0].id;
-				chrome.tabs.sendMessage(tabs[0].id, {greeting: "start-content",tabid}, function(response) {
+				chrome.tabs.sendMessage(tabs[0].id, {greeting: "start-content",tabid,mute}, function(response) {
 				  console.log(response.farewell);
 				});
 			  });
@@ -159,6 +161,7 @@ window.addEventListener('load', () => {
 			if(request.greeting=="checkUser"){
 				console.log(request);
 				if(request.recordingStatus){
+					document.getElementById('mute').disabled=true;
 					tabid=request.tabid;
 					startButton.disabled=true;
 					stopButton.disabled=false;	
