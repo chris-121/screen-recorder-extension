@@ -1,3 +1,6 @@
+*{
+    margin: 0;
+}
 :root{
     --color:#e9e9fd;
     --highlight-color:#625df5;
@@ -62,4 +65,25 @@ header{
 .sign-in-alert{
     padding-top:5px ;
     color: var(--highlight-color);
+}
+.mute-checkBox{
+    padding-top: 5px;
+}
+.link{
+    padding-left: 30px;
+    height: 50px;
+    width: 90%;
+    word-wrap: break-word;
+}
+.last-recording{
+    display: flex;
+    justify-content: space-evenly;
+}
+.heading-color{
+    width: 100%;
+    background-color: var(--color);
+}
+.space{
+    display: flex;
+    justify-content: space-between;
 }

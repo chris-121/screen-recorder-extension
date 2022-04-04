@@ -9,7 +9,7 @@ let stream = null,
 	recordingStatus=null,
 	isUploading=null,
 	isUploaded=null,
-	awsLink=null;
+	links=null;
 	user=null,
 	blob=null,
 	tabid=null,
@@ -41,9 +41,14 @@ let stream = null,
 				  if (request.greeting === "stop"){
 					  console.log("stop");
 					  recordingStatus=false;
-			  
-					  stopRecording();
-					  sendResponse({message:"stop"})
+					if(request.stop){
+						console.log("stopped");
+						stopRecording();
+						sendResponse({message:"stop"})
+					}
+					else{
+						console.log("canceled");
+					}
 				  }
 				  if(request.greeting=="cookieValue"){
 					cookieValue=request.cookieValue
@@ -53,19 +58,18 @@ let stream = null,
 					  console.log("logout");
 					cookieValue=null;
 					user=null;
+					awsLink=null;
+					blob=null;
 				}
 				  if(request.greeting=="aws"){
 					  isUploading=true;
 					uploadToAws();
 				  }
-				  if(request.greeting=="uploadAndDownload"){
-				  uploadAndDwonload();
-				}
 			return true
 	});
 	function checkUser(){
 		console.log("check user");
-		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid,isUploading,isUploaded,awsLink}, function(response) {
+		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid,isUploading,isUploaded,links,percent_completed}, function(response) {
 			console.log(response);
 		  })
 	}
@@ -107,6 +111,8 @@ async function startRecording () {
 			});
 		  });
 		  recordingStatus=true;
+		  isUploaded=false;
+		  blob=null;
 		chrome.runtime.sendMessage({greeting: "rec"}, function(response) {
 			console.log(response);
 		  })
@@ -133,6 +139,8 @@ async function startRecordingMute () {
 			});
 		  });
 		  recordingStatus=true;
+		  isUploaded=false;
+		  blob=null;
 		chrome.runtime.sendMessage({greeting: "rec"}, function(response) {
 			console.log(response);
 		  })
@@ -146,7 +154,7 @@ function stopRecording () {
 	recorder.stop();
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 
-		chrome.tabs.sendMessage(tabid, {greeting: "stop"}, function(response) {
+		chrome.tabs.sendMessage(tabid, {greeting: "stopss"}, function(response) {
 		  console.log(response.farewell);
 		});
 	  });
@@ -201,43 +209,10 @@ request.addEventListener('load', function(e) {
 	isUploaded=true;
 	console.log(request.status);
 	// request.response holds response from the server
-	console.log(request.response);
-	awsLink= request.response.substring(1,request.response.length-1)
-	chrome.runtime.sendMessage({greeting: "link",awsLink}, function(response) {
-		console.log(response);
-	  })
-});
-// send POST request to server
-request.send(data);
-}
-function uploadAndDownload(){
-	let data = new FormData();
-data.append('video', blob, 'video.mp4');
-
-let request = new XMLHttpRequest();
-request.open('POST', 'https://videorecorderbackend.herokuapp.com/downloadVideo'); 
-request.setRequestHeader("auth", cookieValue);
-
-// upload progress event
-request.upload.addEventListener('progress', function(e) {
-	// upload progress as percentage
-	percent_completed= (e.loaded / e.total)*100;
-	chrome.runtime.sendMessage({greeting: "uploadPercentage",percent_completed}, function(response) {
-		console.log(response);
-	  })
-	console.log(percent_completed);
-
-});
-// request finished event
-request.addEventListener('load', function(e) {
-	// HTTP status message (200, 404 etc)
-	isUploading=false;
-	isUploaded=true;
-	console.log(request.status);
-	// request.response holds response from the server
-	console.log(request.response);
-	awsLink= request.response.substring(1,request.response.length-1)
-	chrome.runtime.sendMessage({greeting: "link",awsLink}, function(response) {
+	links = JSON.parse(request.response);
+	console.log(links.watchableLink);
+	 //request.response.substring(1,request.response.length-1)
+	chrome.runtime.sendMessage({greeting: "link",links}, function(response) {
 		console.log(response);
 	  })
 });

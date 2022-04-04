@@ -9,6 +9,7 @@ window.addEventListener('load', () => {
 	awsBtn=document.querySelector(".aws");
 	funcDiv=document.getElementById("func-div");
 	link=document.getElementById("link")
+	downBtn=document.getElementById('download-videos')
 	load();
 //	let value=localStorage.getItem("user")
 //	if(value){
@@ -36,10 +37,10 @@ window.addEventListener('load', () => {
 	}
 	  
 	signUpBtn.addEventListener('click',()=>{
-		chrome.tabs.create({ url: "https://videorecorderbackend.herokuapp.com" });
+		chrome.tabs.create({ url: "https://videorecorderbackend.herokuapp.com/login" });
 	})
 	homeBtn.addEventListener('click',()=>{
-		chrome.tabs.create({ url: "https://videorecorderbackend.herokuapp.com" });
+		chrome.tabs.create({ url: "https://videorecorderbackend.herokuapp.com/home" });
 //detele token from storage and change status
 	})
 	startButton.addEventListener('click',()=>{
@@ -47,25 +48,35 @@ window.addEventListener('load', () => {
 		document.getElementById('aws-text').hidden=true;
 		var mute=document.getElementById('mute').checked
 		console.log(mute);
-		if(url){
-			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-				tabid=tabs[0].id;
-				chrome.tabs.sendMessage(tabs[0].id, {greeting: "start-content",tabid,mute}, function(response) {
-				  console.log(response.farewell);
-				});
-			  });
+		if(mute){
+			bgpage.startRecordingMute();
 		}else{
-			chrome.tabs.create({ url: "https://videorecorderbackend.herokuapp.com" });
+			if(url){
+				chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+					tabid=tabs[0].id;
+					chrome.tabs.sendMessage(tabs[0].id, {greeting: "start-content",tabid}, function(response) {
+					  console.log(response.farewell);
+					});
+				  });
+			}else{
+				chrome.tabs.create({ url: "https://videorecorderbackend.herokuapp.com/home" });
+			}
 		}
 	}
 	)	
 	stopButton.addEventListener('click',()=>{
-		console.log(tabid);
-		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-			chrome.tabs.sendMessage(tabid, {greeting: "stopss"}, function(response) {
-			  console.log(response.farewell);
-			});
-		  });
+		if(mute){
+			chrome.runtime.sendMessage({greeting: "stop",stop:true}, function(response) {
+				console.log(response);
+			  })
+		}else{
+			console.log(tabid);
+			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+				chrome.tabs.sendMessage(tabid, {greeting: "stop",stop:true}, function(response) {
+				  console.log(response.farewell);
+				});
+			  });
+		}
 	});
 	awsBtn.addEventListener('click',()=>{
 		//let cookieValue=localStorage.getItem('cookie')
@@ -78,9 +89,6 @@ window.addEventListener('load', () => {
 		  })
 	})
 	downloadButton.addEventListener('click',()=>{
-		chrome.tabs.sendMessage(tabid, {greeting: "uploadAndDownload"}, function(response) {
-			console.log(response.farewell);
-		  });
 		document.getElementById("timer").hidden=true;
 		document.getElementById("stop-rec").hidden=true;
 		document.getElementById('aws-text').hidden=true;
@@ -102,10 +110,20 @@ window.addEventListener('load', () => {
 			sendResponse({farewell: "goodbye"});
 		  }
 			if(request.greeting==="link"){
-				link.innerText=request.awsLink
-				link.href=request.awsLink
+				document.querySelector(".mute-checkBox").hidden=false;
+				link.innerText=request.links.watchableLink
+				link.href=request.links.watchableLink
+				var watchableLink=request.links.watchableLink;
+				link.addEventListener('click',()=>{
+					console.log("clicked");
+					chrome.tabs.create({ url:'https://'+watchableLink });
+				})
 				linkDiv.hidden=false;
+				awsBtn.disabled=true;
 				console.log("link working");
+				document.getElementById('link-permission').addEventListener('click',()=>{
+					chrome.tabs.create({ url:'https://'+watchableLink });
+				})
 				document.getElementById("timer").hidden=true;
 				document.getElementById("stop-rec").hidden=true;
 				document.getElementById("save-rec").hidden=true;
@@ -143,6 +161,10 @@ window.addEventListener('load', () => {
 				Interval=setInterval(startTimer,1000);
 				startButton.disabled=true;
 				stopButton.disabled=false;
+				awsBtn.disabled=true;
+				document.querySelector(".mute-checkBox").hidden=true;
+				document.getElementById('last-recordings').hidden=true;
+				downloadButton.hidden=false;
 				document.getElementById("timer").hidden=false;
 				document.getElementById('aws-text').hidden=true;
 				document.getElementById("save-rec").hidden=true;
@@ -153,6 +175,7 @@ window.addEventListener('load', () => {
 				seconds=0,mins=0,hours=0;
 				startButton.disabled=false;
 				stopButton.disabled=true;
+				document.querySelector(".mute-checkBox").hidden=false;
 				document.getElementById("timer").hidden=true;
 				document.getElementById('aws-text').hidden=true;
 				document.getElementById("save-rec").hidden=true;
@@ -161,7 +184,9 @@ window.addEventListener('load', () => {
 			if(request.greeting=="checkUser"){
 				console.log(request);
 				if(request.recordingStatus){
-					document.getElementById('mute').disabled=true;
+					//document.getElementById('last-recordings').hidden=true;
+					document.querySelector(".mute-checkBox").hidden=true
+					//document.getElementById('mute').hidden=true;
 					tabid=request.tabid;
 					startButton.disabled=true;
 					stopButton.disabled=false;	
@@ -182,29 +207,40 @@ window.addEventListener('load', () => {
 					homeBtn.hidden=false
 					signUpBtn.hidden=true
 					funcDiv.hidden=false;
+					if(request.blob){
+						awsBtn.disabled=false;
+					}
 					if(request.isUploading){
 						document.getElementById('aws-text').hidden=false
 						document.getElementById('aws-text').innerHTML="Uploading";
 						document.getElementById('progress-bar').hidden=false;
+						var percentage=request.percent_completed;
+						document.getElementById('progress').style.width=percentage+"%";
+						document.getElementById('progress').innerHTML=percentage+"% completed";
+						awsBtn.disabled=true;
 					}
-					if(request.awsLink){
-						link.innerText=request.awsLink
-						link.href=request.awsLink
-						linkDiv.hidden=false;
-						document.getElementById('aws-text').hidden=false
-						document.getElementById('aws-text').innerHTML="Uploaded to AWS";
-					}
-					if(request.blob){
-						awsBtn.disabled=false;
-						if(request.isUploaded){
-							awsBtn.disabled=true;
+					else if(request.isUploaded){
+						awsBtn.disabled=true;
+						if(request.links){
+							var watchableLink=request.links.watchableLink;
+							document.getElementById('last-recordings').hidden=false;
+							document.getElementById('watchable-link').addEventListener('click',()=>{
+								chrome.tabs.create({ url: "https://"+watchableLink });
+							})
+							document.getElementById('video-name').innerText=request.links.file;
+							downBtn.href=request.links.downloadableLink;
+							downBtn.classList.remove('disabled')
+							downloadButton.hidden=true;
+							document.getElementById('aws-text').hidden=true
+							document.getElementById('aws-text').innerHTML="Uploaded to AWS";
+						}						
+					}else{
+						if(request.blob){
+							downloadButton.href=request.downloadButton
+			  				downloadButton.download = 'video.mp4';
+							//downloadButton.disabled = false;
+							downloadButton.classList.remove("disabled")
 						}
-					}
-					if(request.downloadButton){
-						downloadButton.href=request.downloadButton;
-						downloadButton.download = 'video.mp4';
-						downloadButton.disabled = false;
-						downloadButton.classList.remove("disabled")
 					}
 				}else{
 					if(request.blob){

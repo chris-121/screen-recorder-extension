@@ -35,7 +35,6 @@ if(cookieValue){
 chrome.runtime.onMessage.addListener(
 	async function(request, sender, sendResponse) {
 			if (request.greeting === "start-content"){
-				if(request.mute==false){
 					console.log("hai");
 					tabid=request.tabid;
 						prepareFrame();
@@ -45,17 +44,9 @@ chrome.runtime.onMessage.addListener(
 							  })
 		
 						},100)
-				}else{
-					var mute=true
-					chrome.runtime.sendMessage({greeting: "start",tabid,mute}, function(response) {
-						console.log(response);
-					  })
-				}
 			}
 			if (request.greeting === "stopss"){
-				chrome.runtime.sendMessage({greeting: "stop"}, function(response) {
-					console.log(response);
-				  })
+				var stop=request.stop;
 				remove();
 			}
 			if(request.greeting==="check-tab"){
