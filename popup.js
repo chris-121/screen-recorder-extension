@@ -50,6 +50,8 @@ window.addEventListener('load', () => {
 		console.log(mute);
 		if(mute){
 			bgpage.startRecordingMute();
+			startButton.disabled=true;
+			document.querySelector(".mute-checkBox").hidden=true;
 		}else{
 			if(url){
 				chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -58,6 +60,8 @@ window.addEventListener('load', () => {
 					  console.log(response.farewell);
 					});
 				  });
+				  startButton.disabled=true;
+				  document.querySelector(".mute-checkBox").hidden=true;
 			}else{
 				chrome.tabs.create({ url: "https://videorecorderbackend.herokuapp.com/home" });
 			}
@@ -96,6 +100,11 @@ window.addEventListener('load', () => {
 	})
 	chrome.runtime.onMessage.addListener(
 		function(request, sender, sendResponse) {
+			if(request.greeting=="cancel"){
+				console.log("here");
+				startButton.disabled=false;
+				document.querySelector(".mute-checkBox").hidden=false;
+			}
 		  if (request.greeting === "save"){
 			  console.log(request);
 			  downloadButton.href=request.downloadButton
@@ -183,6 +192,10 @@ window.addEventListener('load', () => {
 			}
 			if(request.greeting=="checkUser"){
 				console.log(request);
+				if(request.permission){
+					startButton.disabled=true;
+					document.querySelector(".mute-checkBox").hidden=true;
+				}
 				if(request.recordingStatus){
 					//document.getElementById('last-recordings').hidden=true;
 					document.querySelector(".mute-checkBox").hidden=true

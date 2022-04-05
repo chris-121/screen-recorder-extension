@@ -35,7 +35,6 @@ if(cookieValue){
 chrome.runtime.onMessage.addListener(
 	async function(request, sender, sendResponse) {
 			if (request.greeting === "start-content"){
-					console.log("hai");
 					tabid=request.tabid;
 						prepareFrame();
 						setTimeout(()=>{
@@ -46,8 +45,11 @@ chrome.runtime.onMessage.addListener(
 						},100)
 			}
 			if (request.greeting === "stopss"){
-				var stop=request.stop;
+				console.log("removed");
 				remove();
+				chrome.runtime.sendMessage({greeting: "cancel"}, function(response) {
+					console.log(response);
+				  })
 			}
 			if(request.greeting==="check-tab"){
 				if(window.location.href){

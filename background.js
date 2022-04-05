@@ -13,7 +13,8 @@ let stream = null,
 	user=null,
 	blob=null,
 	tabid=null,
-	percent_completed=null;
+	percent_completed=null,
+	permission=null;
 	var seconds = 00; 
 	var mins = 00; 
 	var hours=00;
@@ -23,20 +24,11 @@ let stream = null,
 		async function(request, sender, sendResponse) {
 				if (request.greeting === "start"){
 					console.log(request);
-					if(request.mute){
 						tabid=request.tabid;
-						awsLink=null;
-						console.log("start");
-						startRecordingMute();						
-					}else{
-						tabid=request.tabid;
-						awsLink=null;
+						permission=true;
 						console.log("start with audio");
 						startRecording();
-
-					}
-					
-							  sendResponse({message:"start"})
+						 sendResponse({message:"start"})
 				  }
 				  if (request.greeting === "stop"){
 					  console.log("stop");
@@ -69,7 +61,7 @@ let stream = null,
 	});
 	function checkUser(){
 		console.log("check user");
-		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid,isUploading,isUploaded,links,percent_completed}, function(response) {
+		chrome.runtime.sendMessage({greeting: "checkUser",cookieValue,user,recordingStatus,blob,downloadButton,hours,mins,seconds,tabid,isUploading,isUploaded,links,percent_completed,permission}, function(response) {
 			console.log(response);
 		  })
 	}
@@ -84,18 +76,26 @@ let stream = null,
 				})
 			}
         } catch (err) {	
-			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-				chrome.tabs.sendMessage(tabid, {greeting: "stopss"}, function(response) {
-				  console.log(response.farewell);
-				});
-			  });
+			if(tabid){
+				chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+					chrome.tabs.sendMessage(tabid, {greeting: "stopss"}, function(response) {
+						tabid=null;
+					  console.log(response.farewell);
+					});
+				  });
+				}else{
+					chrome.runtime.sendMessage({greeting: "cancel"}, function(response) {
+						console.log(response);
+					})
+				}
+			  permission=false;
 		console.error(err)
 	}
 }
 async function startRecording () {
 	var audios=true;
 	await setupStream(audios);
-
+	permission=false;
 	if (stream && audio) {
 		console.log("recording");
 		mixedStream = new MediaStream([...stream.getTracks(), ...audio.getTracks()]);
@@ -113,6 +113,7 @@ async function startRecording () {
 		  recordingStatus=true;
 		  isUploaded=false;
 		  blob=null;
+		  links=null;
 		chrome.runtime.sendMessage({greeting: "rec"}, function(response) {
 			console.log(response);
 		  })
@@ -123,8 +124,9 @@ async function startRecording () {
 	}
 }
 async function startRecordingMute () {
+	permission=true;
 	await setupStream();
-
+	permission=false;
 	if (stream) {
 		mixedStream = new MediaStream([...stream.getTracks()]);
 		recorder = new MediaRecorder(mixedStream);
@@ -163,6 +165,7 @@ function stopRecording () {
 	  })
 	  clearInterval(Interval);
 	  seconds=0,mins=0;hours=0;
+	//  tabid=null;
 }
 function handleDataAvailable (e) {
 	chunks.push(e.data);
