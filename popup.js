@@ -75,11 +75,9 @@ window.addEventListener('load', () => {
 			  })
 		}else{
 			console.log(tabid);
-			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-				chrome.tabs.sendMessage(tabid, {greeting: "stop",stop:true}, function(response) {
+				chrome.runtime.sendMessage(tabid, {greeting: "stop",stop:true}, function(response) {
 				  console.log(response.farewell);
 				});
-			  });
 		}
 	});
 	awsBtn.addEventListener('click',()=>{

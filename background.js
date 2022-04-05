@@ -119,6 +119,7 @@ async function startRecording () {
 		  })
 		  clearInterval(Interval);
 		  Interval = setInterval(startTimer, 1000);
+		  streamListener();
 	} else {
 		console.warn('No stream available.');
 	}
@@ -148,6 +149,7 @@ async function startRecordingMute () {
 		  })
 		  clearInterval(Interval);
 		  Interval = setInterval(startTimer, 1000);
+		  streamListener();
 	} else {
 		console.warn('No stream available.');
 	}
@@ -235,4 +237,17 @@ function startTimer () {
 	}
   
   }
-  
+  function streamListener() {
+	const readyListener = () => {
+	  if (!stream.active) {
+		  if(recordingStatus){
+			  recordingStatus=false;
+			  return stopRecording()
+		  }else{
+			  return
+		  }
+	  }
+	  return setTimeout(readyListener, 250);
+	};
+	readyListener();
+  }
