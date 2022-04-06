@@ -57,10 +57,8 @@ chrome.runtime.onMessage.addListener(
 					sendResponse({url:true})
 				}
 			}
-			return true
 });
 function prepareFrame() {
-	iframe=true;
 	var ifrm = document.createElement("iframe");
 	ifrm.src = chrome.extension.getURL('audiosource.html');
 	ifrm.hidden=true;
