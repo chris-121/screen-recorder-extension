@@ -57,6 +57,7 @@ chrome.runtime.onMessage.addListener(
 					sendResponse({url:true})
 				}
 			}
+			return true
 });
 function prepareFrame() {
 	iframe=true;
@@ -69,6 +70,7 @@ function prepareFrame() {
 }
 function remove(){
 	var ifrm = document.getElementById("iframe");
+	if(ifrm)
 	document.body.removeChild(ifrm);
    }
 if(location.href=="https://videorecorderbackend.herokuapp.com/"){

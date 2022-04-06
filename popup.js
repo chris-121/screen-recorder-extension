@@ -209,6 +209,14 @@ window.addEventListener('load', () => {
 					Interval=setInterval(startTimer,1000);
 					document.getElementById("timer").hidden=false;
 				}
+				else{
+					chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+						tabid=tabs[0].id;
+						chrome.tabs.sendMessage(tabs[0].id, {greeting: "stopss",tabid}, function(response) {
+						  console.log(response.farewell);
+						});
+					  });
+				}
 				if(request.cookieValue){
 					console.log(request);
 					var email = request.user.email;
