@@ -99,9 +99,9 @@ window.addEventListener('load', () => {
 	chrome.runtime.onMessage.addListener(
 		function(request, sender, sendResponse) {
 			if(request.greeting=="cancel"){
-				console.log("here");
-				startButton.disabled=false;
-				document.querySelector(".mute-checkBox").hidden=false;
+					console.log("here");
+					startButton.disabled=false;
+					document.querySelector(".mute-checkBox").hidden=false;
 			}
 		  if (request.greeting === "save"){
 			  console.log(request);
@@ -209,7 +209,7 @@ window.addEventListener('load', () => {
 					Interval=setInterval(startTimer,1000);
 					document.getElementById("timer").hidden=false;
 				}
-				else{
+				else if(!request.permission){
 					chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 						tabid=tabs[0].id;
 						chrome.tabs.sendMessage(tabs[0].id, {greeting: "stopss",tabid}, function(response) {
