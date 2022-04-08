@@ -99,7 +99,7 @@ window.addEventListener('load', () => {
 	chrome.runtime.onMessage.addListener(
 		function(request, sender, sendResponse) {
 			if(request.greeting=="cancel"){
-					console.log("here");
+					//console.log("here");
 					startButton.disabled=false;
 					document.querySelector(".mute-checkBox").hidden=false;
 			}
@@ -288,7 +288,9 @@ window.addEventListener('load', () => {
 		  seconds = 0;
 		  document.getElementById('seconds').innerHTML = "0" + 0;
 		}
-		
+		if(mins >0 && mins<10){
+			document.getElementById('mins').innerHTML = "0" + mins;
+		}
 		if (mins > 9){
 			document.getElementById('mins').innerHTML = mins;
 		}
@@ -297,6 +299,9 @@ window.addEventListener('load', () => {
 			document.getElementById('hours').innerHTML = "0" + hours;
 			mins = 0;
 			document.getElementById('mins').innerHTML = "0" + 0;
+		}
+		if(hours >0 && hours<10){
+			document.getElementById('hours').innerHTML = "0" + hours;
 		}
 		if (hours > 9){
 			document.getElementById('hours').innerHTML = mins;
