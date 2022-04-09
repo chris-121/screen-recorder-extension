@@ -42,7 +42,7 @@ chrome.runtime.onMessage.addListener(
 								console.log(response);
 							  })
 		
-						},100)
+						},200)
 			}
 			if (request.greeting === "stopss"){
 				console.log("removed");
