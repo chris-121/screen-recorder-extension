@@ -22,14 +22,6 @@ let stream = null,
 	var Interval
 	chrome.runtime.onMessage.addListener(
 		async function(request, sender, sendResponse) {
-			if(request.greeting=="bg-evoke"){
-				console.log("ivida indeda mwone");
-				setTimeout(()=>{
-					chrome.runtime.sendMessage({greeting: "evoke"}, function(response) {
-						console.log(response);
-					})
-				},1000)
-			}
 				if (request.greeting === "start"){
 					console.log(request);
 						tabid=request.tabid;
@@ -200,6 +192,7 @@ function handleStop (e) {
 function uploadToAws(){
 	let data = new FormData();
 data.append('video', blob, 'video.mp4');
+
 let request = new XMLHttpRequest();
 request.open('POST', 'https://videorecorderbackend.herokuapp.com/uploadVideo'); 
 request.setRequestHeader("auth", cookieValue);
